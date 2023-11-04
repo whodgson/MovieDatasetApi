@@ -2,11 +2,10 @@
 
 namespace MovieDatasetApi
 {
-    public static class Database
+    public class Database : IDatabase
     {
-        private static List<Movie> movies;
-
-        public static List<Movie> Movies
+        private IEnumerable<Movie> movies;
+        public IEnumerable<Movie> Movies
         {
             get
             {
@@ -17,7 +16,7 @@ namespace MovieDatasetApi
             }
         }
 
-        private static List<Movie> LoadMoviesFromCsv()
+        private IEnumerable<Movie> LoadMoviesFromCsv()
         {
             var rawValues = File.ReadAllLines(@"mymoviedb.csv")
                 .Skip(1)
@@ -29,7 +28,8 @@ namespace MovieDatasetApi
             {
                 // Split the column read from the CSV, it's important
                 // to only split commas that lie outside of double-quote
-                // blocks. This will fail if the data is at all malformed.
+                // blocks. If one of the records is malformed, it will be skipped.
+
                 string[] columnValues = Regex.Split(rawValue, "[,]{1}(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
 
                 try
