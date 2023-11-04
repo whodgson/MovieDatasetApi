@@ -37,10 +37,24 @@ namespace MovieDatasetApiTests
                     PosterUrl = "www.google.co.uk",
                 }
             },
+            {
+                new Movie
+                {
+                    ReleaseDate = new DateTime(2001,2,2),
+                    Title = "Finally Funny",
+                    Overview = "After 8000 years, comedy has been invented.",
+                    Popularity = 8.5F,
+                    VoteCount = 41626,
+                    VoteAverage = 7.7F,
+                    OriginalLanguage = "en",
+                    Genre = "Comedy",
+                    PosterUrl = "www.google.co.uk",
+                }
+            },
         };
 
         [Fact]
-        public void GetMovies_WithCount_CorrectNumberShouldBeReturned()
+        public void GetMovies_WithCount_CorrectNumber()
         {
             // Arrrange.
             var mockLogger = new Mock<ILogger<MovieDataSetController>>();
@@ -51,6 +65,57 @@ namespace MovieDatasetApiTests
 
             // Act.
             var results = movieDataSetController.Get(1, 1, MovieOrderBy.None, null, null);
+
+            // Assert.
+            Assert.True(results.Count() == 1);
+        }
+
+        [Fact]
+        public void GetMovies_WithTitleQuery_CorrectNumber()
+        {
+            // Arrrange.
+            var mockLogger = new Mock<ILogger<MovieDataSetController>>();
+            var mockDatabase = new Mock<IDatabase>();
+            mockDatabase.Setup(x => x.Movies).Returns(DummyMovies);
+
+            var movieDataSetController = new MovieDataSetController(mockLogger.Object, mockDatabase.Object);
+
+            // Act.
+            var results = movieDataSetController.Get(10, 1, MovieOrderBy.None, "Birthday", null);
+
+            // Assert.
+            Assert.True(results.Count() == 1);
+        }
+
+        [Fact]
+        public void GetMovies_WithInvalidTitleQuery_NoRecords()
+        {
+            // Arrrange.
+            var mockLogger = new Mock<ILogger<MovieDataSetController>>();
+            var mockDatabase = new Mock<IDatabase>();
+            mockDatabase.Setup(x => x.Movies).Returns(DummyMovies);
+
+            var movieDataSetController = new MovieDataSetController(mockLogger.Object, mockDatabase.Object);
+
+            // Act.
+            var results = movieDataSetController.Get(10, 1, MovieOrderBy.None, "Birth-day", null);
+
+            // Assert.
+            Assert.True(results.Count() == 0);
+        }
+
+        [Fact]
+        public void GetMovies_SecondPageWithCount_CorrectNumber()
+        {
+            // Arrrange.
+            var mockLogger = new Mock<ILogger<MovieDataSetController>>();
+            var mockDatabase = new Mock<IDatabase>();
+            mockDatabase.Setup(x => x.Movies).Returns(DummyMovies);
+
+            var movieDataSetController = new MovieDataSetController(mockLogger.Object, mockDatabase.Object);
+
+            // Act.
+            var results = movieDataSetController.Get(2, 2, MovieOrderBy.None, null, null);
 
             // Assert.
             Assert.True(results.Count() == 1);
